@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="MoneyTrack – Personal daily expense and income tracker" />
+    <meta name="theme-color" content="#0f1117" />
+
+    <!-- PWA manifest (Phase 4 ready) -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css" />
+
+    <title>MoneyTrack</title>
+  </head>
+
+  <body>
+    <!-- =============================================
+         APP SHELL
+         All content is injected by JavaScript.
+         This keeps the HTML clean and separation clear.
+    ============================================== -->
+    <div id="app">
+
+      <!-- ── Header ───────────────────────────── -->
+      <header class="header" role="banner">
+        <div class="logo">money<span class="logo__accent">track</span></div>
+        <time class="header__date" id="headerDate" aria-label="Today's date"></time>
+      </header>
+
+      <!-- ── Navigation Tabs ───────────────────── -->
+      <nav class="tab-bar" role="navigation" aria-label="Main navigation">
+        <button
+          class="tab tab--active"
+          data-tab="today"
+          aria-selected="true"
+          role="tab"
+        >Today</button>
+        <button
+          class="tab"
+          data-tab="week"
+          aria-selected="false"
+          role="tab"
+        >Week</button>
+        <button
+          class="tab"
+          data-tab="month"
+          aria-selected="false"
+          role="tab"
+        >Month</button>
+      </nav>
+
+      <!-- ── Main Content ──────────────────────── -->
+      <main id="main-content" role="main">
+
+        <!-- TODAY TAB -->
+        <section
+          id="tab-today"
+          class="tab-panel tab-panel--active"
+          aria-labelledby="tab-today-label"
+          role="tabpanel"
+        >
+          <!-- Summary Hero Card -->
+          <div class="hero-card" aria-live="polite">
+            <p class="hero-card__label">Total spent today</p>
+            <p class="hero-card__amount">
+              <span class="hero-card__currency" aria-hidden="true">৳</span>
+              <span id="todayTotal" aria-label="Total expenses today">0</span>
+            </p>
+            <div class="hero-card__meta">
+              <span class="hero-card__stat">
+                <strong id="todayCount">0</strong> entries
+              </span>
+              <span class="hero-card__stat">
+                Income: <strong id="todayIncome" class="text--income">৳0</strong>
+              </span>
+              <span class="hero-card__stat">
+                Net: <strong id="todayNet">৳0</strong>
+              </span>
+            </div>
+          </div>
+
+          <!-- Add Entry Form -->
+          <div class="card form-card" role="form" aria-label="Add new entry">
+            <h2 class="form-card__title">Add entry</h2>
+
+            <!-- Expense / Income toggle -->
+            <div class="type-toggle" role="group" aria-label="Entry type">
+              <button
+                class="type-btn type-btn--expense type-btn--active"
+                data-type="expense"
+                aria-pressed="true"
+              >↑ Expense</button>
+              <button
+                class="type-btn type-btn--income"
+                data-type="income"
+                aria-pressed="false"
+              >↓ Income</button>
+            </div>
+
+            <!-- Form fields -->
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="entryName">Name</label>
+                <input
+                  type="text"
+                  id="entryName"
+                  class="form-input"
+                  placeholder="e.g. Lunch, Rent..."
+                  maxlength="60"
+                  autocomplete="off"
+                  aria-required="true"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="entrySource">Source</label>
+                <select id="entrySource" class="form-input form-select" aria-required="true">
+                  <option value="Cash">Cash</option>
+                  <option value="bKash">bKash</option>
+                  <option value="Nagad">Nagad</option>
+                  <option value="Bank">Bank</option>
+                  <option value="Card">Card</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="entryAmount">Amount (৳)</label>
+              <input
+                type="number"
+                id="entryAmount"
+                class="form-input"
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                aria-required="true"
+              />
+            </div>
+
+            <!-- Validation error message -->
+            <p class="form-error" id="formError" role="alert" aria-live="assertive"></p>
+
+            <button class="btn btn--primary btn--full" id="addEntryBtn">
+              Add Entry
+            </button>
+          </div>
+
+          <!-- Today's entry list -->
+          <div class="entries-section">
+            <h2 class="entries-section__title">Today's entries</h2>
+            <div
+              id="todayEntries"
+              aria-live="polite"
+              aria-label="Today's transaction list"
+            ></div>
+          </div>
+        </section>
+
+        <!-- WEEK TAB -->
+        <section
+          id="tab-week"
+          class="tab-panel"
+          aria-labelledby="tab-week-label"
+          role="tabpanel"
+          hidden
+        >
+          <div class="balance-row" id="weekBalance" aria-label="Weekly summary"></div>
+          <div class="week-chart" id="weekGrid" role="img" aria-label="Weekly spending bar chart"></div>
+          <h2 class="entries-section__title">All entries this week</h2>
+          <div id="weekEntries" aria-live="polite"></div>
+        </section>
+
+        <!-- MONTH TAB -->
+        <section
+          id="tab-month"
+          class="tab-panel"
+          aria-labelledby="tab-month-label"
+          role="tabpanel"
+          hidden
+        >
+          <div class="balance-row" id="monthBalance" aria-label="Monthly summary"></div>
+          <h2 class="entries-section__title">Spending by source</h2>
+          <div id="monthSources" aria-live="polite"></div>
+          <h2 class="entries-section__title" style="margin-top: 1.5rem;">Daily breakdown</h2>
+          <div id="monthDays" aria-live="polite"></div>
+        </section>
+
+      </main>
+    </div><!-- /#app -->
+
+    <!-- Toast notification (injected by ui.js) -->
+    <div
+      class="toast"
+      id="toast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
+    <!-- =============================================
+         SCRIPTS — loaded at bottom so DOM is ready.
+         Order matters: utils → storage → ui → app
+    ============================================== -->
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

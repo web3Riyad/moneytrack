@@ -1,0 +1,799 @@
+/* =============================================================
+   MoneyTrack — main.css
+   Structure:
+     1. Design Tokens (CSS custom properties)
+     2. Reset & Base
+     3. Layout (app shell, header, tabs, panels)
+     4. Components (cards, forms, buttons, entries, charts)
+     5. Utilities
+     6. Animations
+     7. Responsive
+   ============================================================= */
+
+
+/* ── 1. Design Tokens ─────────────────────────────────────── */
+:root {
+  /* Colors — Base */
+  --color-bg:           #0f1117;
+  --color-surface:      #181c25;
+  --color-card:         #1e2330;
+  --color-border:       #2a2f3e;
+  --color-border-hover: #3a4050;
+
+  /* Colors — Text */
+  --color-text-primary:   #e8eaf0;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted:     #6b7280;
+
+  /* Colors — Semantic */
+  --color-income:     #4ade80;
+  --color-income-bg:  #1a3a26;
+  --color-expense:    #f87171;
+  --color-expense-bg: #3a1a1a;
+  --color-info:       #60a5fa;
+  --color-info-bg:    #1a2a3a;
+  --color-amber:      #fbbf24;
+  --color-amber-bg:   #3a2a0a;
+
+  /* Typography */
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+
+  /* Spacing scale */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Transitions */
+  --transition-fast: 0.12s ease;
+  --transition-base: 0.2s ease;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  /* Layout */
+  --max-width: 480px;
+  --tab-bar-height: 52px;
+}
+
+
+/* ── 2. Reset & Base ──────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove default button styles */
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Remove number input spinners */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* Focus visible — accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-income);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+
+/* ── 3. Layout ────────────────────────────────────────────── */
+
+/* App shell */
+#app {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-bottom: 80px; /* prevent content hiding behind bottom nav on mobile */
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-5) var(--space-4) var(--space-2);
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--color-text-primary);
+}
+
+.logo__accent {
+  color: var(--color-income);
+}
+
+.header__date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  position: sticky;
+  top: 0;
+  background-color: var(--color-bg);
+  z-index: 100;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Tab button */
+.tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-1);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast);
+}
+
+.tab:hover {
+  color: var(--color-text-secondary);
+  background-color: var(--color-card);
+}
+
+.tab--active,
+.tab[aria-selected='true'] {
+  background-color: var(--color-income-bg);
+  color: var(--color-income);
+}
+
+/* Tab panels */
+.tab-panel {
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.tab-panel--active {
+  display: block;
+}
+
+/* Main content */
+main {
+  min-height: 60vh;
+}
+
+
+/* ── 4. Components ────────────────────────────────────────── */
+
+/* ---- Hero summary card ---- */
+.hero-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-card);
+}
+
+.hero-card__label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: var(--space-2);
+}
+
+.hero-card__amount {
+  font-family: var(--font-mono);
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  color: var(--color-text-primary);
+}
+
+.hero-card__currency {
+  font-size: 20px;
+  color: var(--color-text-muted);
+  margin-right: 2px;
+}
+
+.hero-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.hero-card__stat {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.hero-card__stat strong {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+
+/* ---- Generic card ---- */
+.card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+}
+
+
+/* ---- Add entry form card ---- */
+.form-card {
+  margin-bottom: var(--space-4);
+}
+
+.form-card__title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: var(--space-3);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.form-label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.3px;
+}
+
+.form-input {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px var(--space-3);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  width: 100%;
+  transition: border-color var(--transition-fast);
+}
+
+.form-input:hover {
+  border-color: var(--color-border-hover);
+}
+
+.form-input:focus {
+  border-color: var(--color-income);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+.form-select option {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.form-error {
+  font-size: 12px;
+  color: var(--color-expense);
+  min-height: 18px;
+  margin-bottom: var(--space-1);
+}
+
+
+/* ---- Type toggle (Expense / Income) ---- */
+.type-toggle {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.type-btn {
+  flex: 1;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.type-btn:hover {
+  background-color: var(--color-card);
+}
+
+.type-btn--expense.type-btn--active {
+  background-color: var(--color-expense-bg);
+  color: var(--color-expense);
+  border-color: var(--color-expense);
+}
+
+.type-btn--income.type-btn--active {
+  background-color: var(--color-income-bg);
+  color: var(--color-income);
+  border-color: var(--color-income);
+}
+
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-4);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition-fast),
+              transform var(--transition-fast);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn--primary {
+  background-color: var(--color-income);
+  color: #0a1f10;
+}
+
+.btn--primary:hover {
+  opacity: 0.9;
+}
+
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--full {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.btn--icon {
+  padding: var(--space-1) var(--space-2);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast),
+              background-color var(--transition-fast);
+}
+
+.btn--icon:hover {
+  color: var(--color-expense);
+  background-color: var(--color-expense-bg);
+}
+
+
+/* ---- Entries section ---- */
+.entries-section__title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: var(--space-2);
+}
+
+
+/* ---- Entry item ---- */
+.entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-3);
+  margin-bottom: var(--space-2);
+  transition: border-color var(--transition-fast);
+}
+
+.entry:hover {
+  border-color: var(--color-border-hover);
+}
+
+.entry__icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.entry__icon--expense {
+  background-color: var(--color-expense-bg);
+  color: var(--color-expense);
+}
+
+.entry__icon--income {
+  background-color: var(--color-income-bg);
+  color: var(--color-income);
+}
+
+.entry__info {
+  flex: 1;
+  min-width: 0; /* allows text-overflow to work */
+}
+
+.entry__name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-primary);
+}
+
+.entry__meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.entry__source-tag {
+  display: inline-block;
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.entry__amount {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.entry__amount--expense {
+  color: var(--color-expense);
+}
+
+.entry__amount--income {
+  color: var(--color-income);
+}
+
+
+/* ---- Balance row (3 stats side by side) ---- */
+.balance-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.balance-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.balance-card__label {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.balance-card__value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.balance-card__value--income  { color: var(--color-income); }
+.balance-card__value--expense { color: var(--color-expense); }
+.balance-card__value--pos     { color: var(--color-income); }
+.balance-card__value--neg     { color: var(--color-expense); }
+
+
+/* ---- Weekly bar chart ---- */
+.week-chart {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+}
+
+.week-col {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-1);
+  text-align: center;
+}
+
+.week-col--today {
+  border-color: var(--color-income);
+}
+
+.week-col__day {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+  text-transform: uppercase;
+}
+
+.week-col__bar-wrap {
+  height: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: var(--space-1);
+}
+
+.week-col__bar {
+  width: 14px;
+  background-color: var(--color-expense-bg);
+  border: 1px solid var(--color-expense);
+  border-radius: 3px;
+  opacity: 0.65;
+  transition: height var(--transition-base);
+}
+
+.week-col--today .week-col__bar {
+  opacity: 1;
+}
+
+.week-col__amount {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--color-text-muted);
+}
+
+
+/* ---- Month source bars ---- */
+.source-bar {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.source-bar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.source-bar__name {
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.source-bar__value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-expense);
+}
+
+.progress-track {
+  height: 4px;
+  background-color: var(--color-surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--color-expense);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+
+/* ---- Day breakdown card (month view) ---- */
+.day-row {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-row__date {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.day-row__amount {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-expense);
+}
+
+
+/* ---- Empty state ---- */
+.empty-state {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.empty-state__icon {
+  font-size: 32px;
+  margin-bottom: var(--space-2);
+  opacity: 0.5;
+}
+
+
+/* ---- Toast notification ---- */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background-color: var(--color-income);
+  color: #0a1f10;
+  padding: var(--space-2) var(--space-5);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity var(--transition-base),
+              transform var(--transition-base);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast--error {
+  background-color: var(--color-expense);
+  color: #fff;
+}
+
+
+/* ── 5. Utilities ─────────────────────────────────────────── */
+.text--income  { color: var(--color-income) !important; }
+.text--expense { color: var(--color-expense) !important; }
+.text--muted   { color: var(--color-text-muted) !important; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ── 6. Animations ────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.entry {
+  animation: fadeInUp 0.2s ease both;
+}
+
+
+/* ── 7. Responsive ────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .hero-card__amount {
+    font-size: 30px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .balance-card__value {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

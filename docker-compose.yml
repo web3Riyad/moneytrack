@@ -1,0 +1,54 @@
+# docker-compose.yml
+# ------------------
+# Defines and runs the MoneyTrack application as Docker services.
+#
+# Usage:
+#   Start:   docker compose up --build
+#   Stop:    docker compose down
+#   Logs:    docker compose logs -f
+#
+# In Phase 1 there is one service: the frontend.
+# In Phase 2+ we will add: firebase-emulator / backend / database services.
+
+version: "3.9"
+
+services:
+
+  # ── Frontend ──────────────────────────────────────────────
+  frontend:
+    # Build the image using our Dockerfile in the project root
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production   # Use the "production" stage
+
+    # Container name (appears in `docker ps`)
+    container_name: moneytrack-frontend
+
+    # Port mapping: "HOST:CONTAINER"
+    # Visit http://localhost:3000 in your browser
+    ports:
+      - "3000:80"
+
+    # Restart policy:
+    #   "unless-stopped" = restart automatically if it crashes,
+    #   but NOT if you manually run `docker compose down`
+    restart: unless-stopped
+
+    # Health check — Docker will monitor this endpoint
+    # and mark the container unhealthy if it stops responding
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout:  5s
+      retries:  3
+      start_period: 10s
+
+    # Resource limits (prevents the container eating all RAM/CPU)
+    deploy:
+      resources:
+        limits:
+          cpus:   "0.25"
+          memory: "128M"
+        reservations:
+          memory: "32M"
