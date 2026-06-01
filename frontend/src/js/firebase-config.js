@@ -25,8 +25,10 @@ const firebaseConfig = {
   appId:             "1:612980577415:web:171e42cf35ee0828835422",
 };
 
-// Initialise Firebase (safe to call once globally)
-firebase.initializeApp(firebaseConfig);
+// Initialise Firebase — guard prevents "already exists" error if script loads twice
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 /**
  * Auth service — used for login, register, Google sign-in, sign-out.

@@ -25,18 +25,34 @@
 
   /* ── Boot ───────────────────────────────────────────────── */
 
+  // function init() {
+  //   // Show loading screen immediately — prevents flash of wrong screen
+  //   UI.showScreen('loading');
+
+  //   // Firebase Auth listener — this is the single source of truth for auth state.
+  //   // It fires once on page load (telling us if user is already logged in)
+  //   // and again whenever login/logout happens.
+  //   FirebaseAuth.onAuthStateChanged(onAuthStateChanged);
+
+  //   bindAuthEvents();
+  //   bindAppEvents();
+  // }
   function init() {
-    // Show loading screen immediately — prevents flash of wrong screen
-    UI.showScreen('loading');
+  UI.showScreen('loading');
 
-    // Firebase Auth listener — this is the single source of truth for auth state.
-    // It fires once on page load (telling us if user is already logged in)
-    // and again whenever login/logout happens.
-    FirebaseAuth.onAuthStateChanged(onAuthStateChanged);
+  // Fallback: if Firebase auth takes too long, show login screen
+  const authTimeout = setTimeout(() => {
+    UI.showScreen('auth');
+  }, 3000);
 
-    bindAuthEvents();
-    bindAppEvents();
-  }
+  FirebaseAuth.onAuthStateChanged(function(user) {
+    clearTimeout(authTimeout);
+    onAuthStateChanged(user);
+  });
+
+  bindAuthEvents();
+  bindAppEvents();
+}
 
   /* ── Auth state handler ─────────────────────────────────── */
 
@@ -169,7 +185,9 @@
       const cred = await FirebaseAuth.createUserWithEmailAndPassword(email, password);
       // Save display name to the Firebase user profile
       await cred.user.updateProfile({ displayName: name });
-      // onAuthStateChanged fires automatically
+      // onAuthStateChanged already fired (on createUser) before displayName was set.
+      // Re-render header now that displayName is available on the user object.
+      UI.renderUserInfo(cred.user);
     } catch (err) {
       UI.showFormError('registerError', friendlyAuthError(err.code));
       UI.setButtonLoading('registerBtn', false, '', 'Create account');

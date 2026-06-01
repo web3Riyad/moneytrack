@@ -51,6 +51,9 @@ input[type='number'] { -moz-appearance:textfield; }
 :focus-visible { outline:2px solid var(--color-income); outline-offset:2px; border-radius:var(--radius-sm); }
 
 /* ── 3. Loading Screen ────────────────────────────────────── */
+/* Without this rule, the author-level display:flex below overrides the
+   browser's UA-level [hidden]{display:none}, making showScreen() a no-op. */
+.loading-screen[hidden] { display: none; }
 .loading-screen {
   min-height: 100vh;
   display: flex;
@@ -76,6 +79,8 @@ input[type='number'] { -moz-appearance:textfield; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── 4. Auth Screen ───────────────────────────────────────── */
+/* Same issue: display:flex must not override [hidden] */
+.auth-screen[hidden] { display: none; }
 .auth-screen {
   min-height: 100vh;
   display: flex;
