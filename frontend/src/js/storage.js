@@ -123,10 +123,11 @@ const Storage = (() => {
     try {
       const snapshot = await _entriesRef()
         .where('date', '==', dateStr)
-        .orderBy('ts', 'desc')
         .get();
 
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => b.ts - a.ts);
     } catch (err) {
       console.error('[Storage] getEntriesByDate failed:', err);
       return [];
@@ -145,11 +146,14 @@ const Storage = (() => {
       const snapshot = await _entriesRef()
         .where('date', '>=', from)
         .where('date', '<=', to)
-        .orderBy('date', 'desc')
-        .orderBy('ts', 'desc')
         .get();
 
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => {
+          if (a.date !== b.date) return b.date.localeCompare(a.date);
+          return b.ts - a.ts;
+        });
     } catch (err) {
       console.error('[Storage] getEntriesByRange failed:', err);
       return [];
