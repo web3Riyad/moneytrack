@@ -111,8 +111,8 @@ This project is being built in phases to demonstrate growth across the full stac
 | Phase | Description | Status |
 |---|---|---|
 | **1 — Static** | HTML/CSS/JS + localStorage + Docker + Netlify | ✅ Live |
-| **2 — Multi-user** | Firebase Auth + Firestore cloud database | 🔜 Next |
-| **3 — Full-stack** | React + Supabase (PostgreSQL) + Vercel | 📋 Planned |
+| **2 — Multi-user** | Firebase Auth + Firestore cloud database | ✅ Live |
+| **3 — Full-stack** | React + Supabase (PostgreSQL) + Vercel | 🔜 Next |
 | **4 — PWA** | Installable app, offline support, push notifications | 📋 Planned |
 | **5 — AI/ML** | Spending predictions, smart categorisation, natural language input | 📋 Planned |
 
