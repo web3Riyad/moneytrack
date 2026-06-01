@@ -1,74 +1,70 @@
 /**
- * storage.js
- * ----------
- * Handles ALL data persistence for Phase 1.
- * Wraps localStorage so the rest of the app never touches it directly.
+ * storage.js  (Phase 2 — Firebase Firestore)
+ * -------------------------------------------
+ * This file REPLACES the Phase 1 localStorage version.
+ * The PUBLIC API (function names + return shapes) is identical.
+ * That means app.js and ui.js required ZERO changes.
+ * This is the Repository Pattern in action.
  *
- * Why this matters:
- *   In Phase 2 we swap this file for a Firebase version.
- *   The rest of the app (app.js, ui.js) stays unchanged.
- *   This pattern is called the "Repository Pattern".
+ * Firestore data structure:
  *
- * Data model (one entry object):
- * {
- *   id:     number,   — unique identifier
- *   date:   string,   — "YYYY-MM-DD" (local date)
- *   name:   string,   — user-supplied label  e.g. "Lunch"
- *   source: string,   — payment source       e.g. "bKash"
- *   amount: number,   — positive number      e.g. 150
- *   type:   string,   — "expense" | "income"
- *   ts:     number,   — unix timestamp ms (for sorting)
- * }
+ *   users/                          ← collection
+ *     {userId}/                     ← document (one per user)
+ *       entries/                    ← sub-collection
+ *         {entryId}/                ← document (one per entry)
+ *           id, date, name, source, amount, type, ts
+ *
+ * Each user's data is completely isolated.
+ * Security Rules ensure users can only access their own sub-collection.
+ *
+ * Key difference from Phase 1:
+ *   Phase 1: synchronous  (localStorage is instant, in-browser)
+ *   Phase 2: asynchronous (Firestore is a network call → returns Promises)
+ *
+ *   All functions now return Promises.
+ *   Callers use await or .then() to get the result.
  */
 
 const Storage = (() => {
-  /** Key used in localStorage */
-  const STORAGE_KEY = 'moneytrack_entries_v1';
+
+  /** Currently authenticated user — set by app.js on login */
+  let _currentUser = null;
 
   /**
-   * Load all entries from localStorage.
-   * Returns an empty array if nothing is saved or data is corrupt.
+   * Called by app.js whenever auth state changes.
+   * Storage needs the user to know which Firestore path to read/write.
    *
-   * @returns {Object[]}
+   * @param {Object|null} user  — Firebase User object or null
    */
-  function loadAll() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      // Basic validation: must be an array
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (err) {
-      console.error('[Storage] Failed to load entries:', err);
-      return [];
-    }
+  function setUser(user) {
+    _currentUser = user;
   }
 
   /**
-   * Persist the full entries array to localStorage.
+   * Get the Firestore reference to the current user's entries sub-collection.
+   * Throws if no user is set (should never happen if app.js is correct).
    *
-   * @param {Object[]} entries
-   * @returns {boolean} true on success
+   * Path: users/{userId}/entries
+   *
+   * @returns {firebase.firestore.CollectionReference}
    */
-  function saveAll(entries) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-      return true;
-    } catch (err) {
-      // Can fail if storage is full (QuotaExceededError)
-      console.error('[Storage] Failed to save entries:', err);
-      return false;
+  function _entriesRef() {
+    if (!_currentUser) {
+      throw new Error('[Storage] No authenticated user. Cannot access Firestore.');
     }
+    return FirebaseDB
+      .collection('users')
+      .doc(_currentUser.uid)
+      .collection('entries');
   }
 
   /**
-   * Add a single new entry.
-   * Validates required fields before saving.
+   * Add a single new entry to Firestore.
    *
-   * @param {Object} entry  — must have: name, source, amount, type
-   * @returns {{ success: boolean, entry?: Object, error?: string }}
+   * @param {Object} entry  — { name, source, amount, type }
+   * @returns {Promise<{ success: boolean, entry?: Object, error?: string }>}
    */
-  function addEntry(entry) {
+  async function addEntry(entry) {
     // Validate
     if (!entry.name || String(entry.name).trim() === '') {
       return { success: false, error: 'Name is required.' };
@@ -81,53 +77,60 @@ const Storage = (() => {
     }
 
     const newEntry = {
-      id:     Utils.generateId(),
       date:   Utils.todayString(),
       name:   Utils.sanitise(entry.name),
       source: Utils.sanitise(entry.source || 'Cash'),
-      amount: Math.round(Number(entry.amount) * 100) / 100, // 2 decimal places
+      amount: Math.round(Number(entry.amount) * 100) / 100,
       type:   entry.type,
       ts:     Date.now(),
     };
 
-    const entries = loadAll();
-    entries.push(newEntry);
-
-    const saved = saveAll(entries);
-    if (!saved) {
-      return { success: false, error: 'Could not save. Storage may be full.' };
+    try {
+      // Firestore auto-generates the document ID
+      const docRef = await _entriesRef().add(newEntry);
+      // Add the Firestore doc ID as the entry's id
+      newEntry.id = docRef.id;
+      return { success: true, entry: newEntry };
+    } catch (err) {
+      console.error('[Storage] addEntry failed:', err);
+      return { success: false, error: 'Could not save. Check your connection.' };
     }
-
-    return { success: true, entry: newEntry };
   }
 
   /**
-   * Delete an entry by ID.
+   * Delete an entry by its Firestore document ID.
    *
-   * @param {number} id
-   * @returns {boolean} true if an entry was removed
+   * @param {string} id  — Firestore document ID
+   * @returns {Promise<boolean>}
    */
-  function deleteEntry(id) {
-    const entries = loadAll();
-    const filtered = entries.filter((e) => e.id !== id);
-
-    if (filtered.length === entries.length) {
-      console.warn('[Storage] deleteEntry: id not found:', id);
+  async function deleteEntry(id) {
+    try {
+      await _entriesRef().doc(id).delete();
+      return true;
+    } catch (err) {
+      console.error('[Storage] deleteEntry failed:', err);
       return false;
     }
-
-    saveAll(filtered);
-    return true;
   }
 
   /**
    * Get all entries for a specific date.
    *
    * @param {string} dateStr  "YYYY-MM-DD"
-   * @returns {Object[]}
+   * @returns {Promise<Object[]>}
    */
-  function getEntriesByDate(dateStr) {
-    return loadAll().filter((e) => e.date === dateStr);
+  async function getEntriesByDate(dateStr) {
+    try {
+      const snapshot = await _entriesRef()
+        .where('date', '==', dateStr)
+        .orderBy('ts', 'desc')
+        .get();
+
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (err) {
+      console.error('[Storage] getEntriesByDate failed:', err);
+      return [];
+    }
   }
 
   /**
@@ -135,27 +138,38 @@ const Storage = (() => {
    *
    * @param {string} from  "YYYY-MM-DD"
    * @param {string} to    "YYYY-MM-DD"
-   * @returns {Object[]}
+   * @returns {Promise<Object[]>}
    */
-  function getEntriesByRange(from, to) {
-    return loadAll().filter((e) => e.date >= from && e.date <= to);
+  async function getEntriesByRange(from, to) {
+    try {
+      const snapshot = await _entriesRef()
+        .where('date', '>=', from)
+        .where('date', '<=', to)
+        .orderBy('date', 'desc')
+        .orderBy('ts', 'desc')
+        .get();
+
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (err) {
+      console.error('[Storage] getEntriesByRange failed:', err);
+      return [];
+    }
   }
 
   /**
-   * Calculate totals from an array of entries.
+   * Calculate income, expense, net totals from an array of entries.
+   * Pure function — same as Phase 1, no Firestore call.
    *
    * @param {Object[]} entries
    * @returns {{ income: number, expense: number, net: number, count: number }}
    */
   function calcTotals(entries) {
     const income  = entries
-      .filter((e) => e.type === 'income')
+      .filter(e => e.type === 'income')
       .reduce((sum, e) => sum + e.amount, 0);
-
     const expense = entries
-      .filter((e) => e.type === 'expense')
+      .filter(e => e.type === 'expense')
       .reduce((sum, e) => sum + e.amount, 0);
-
     return {
       income:  Math.round(income  * 100) / 100,
       expense: Math.round(expense * 100) / 100,
@@ -165,8 +179,8 @@ const Storage = (() => {
   }
 
   /**
-   * Group entries by source and sum expense amounts.
-   * Returns sorted array: highest first.
+   * Group entries by source and sum expenses.
+   * Pure function — no Firestore call.
    *
    * @param {Object[]} entries
    * @returns {Array<{ source: string, amount: number }>}
@@ -174,57 +188,38 @@ const Storage = (() => {
   function groupBySource(entries) {
     const map = {};
     entries
-      .filter((e) => e.type === 'expense')
-      .forEach((e) => {
-        map[e.source] = (map[e.source] || 0) + e.amount;
-      });
-
+      .filter(e => e.type === 'expense')
+      .forEach(e => { map[e.source] = (map[e.source] || 0) + e.amount; });
     return Object.entries(map)
       .map(([source, amount]) => ({ source, amount: Math.round(amount * 100) / 100 }))
       .sort((a, b) => b.amount - a.amount);
   }
 
   /**
-   * Group entries by date and sum expense amounts.
-   * Returns an object: { "YYYY-MM-DD": totalExpense }
+   * Group entries by date and sum expenses.
+   * Pure function — no Firestore call.
    *
    * @param {Object[]} entries
-   * @returns {Object}
+   * @returns {Object}  { "YYYY-MM-DD": totalExpense }
    */
   function groupByDate(entries) {
     const map = {};
     entries
-      .filter((e) => e.type === 'expense')
-      .forEach((e) => {
-        map[e.date] = (map[e.date] || 0) + e.amount;
-      });
-
-    // Round values
-    Object.keys(map).forEach((k) => {
-      map[k] = Math.round(map[k] * 100) / 100;
-    });
-
+      .filter(e => e.type === 'expense')
+      .forEach(e => { map[e.date] = (map[e.date] || 0) + e.amount; });
+    Object.keys(map).forEach(k => { map[k] = Math.round(map[k] * 100) / 100; });
     return map;
   }
 
-  /**
-   * Clear ALL stored data.
-   * Used in development / testing only.
-   */
-  function clearAll() {
-    localStorage.removeItem(STORAGE_KEY);
-  }
-
-  // Public API
+  // Public API — same names as Phase 1
   return {
+    setUser,
     addEntry,
     deleteEntry,
-    loadAll,
     getEntriesByDate,
     getEntriesByRange,
     calcTotals,
     groupBySource,
     groupByDate,
-    clearAll,
   };
 })();
