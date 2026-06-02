@@ -325,6 +325,9 @@ function EntryRow({ entry, showDate, onDelete }) {
           {entry.source}
           <span className="entry-tag">{entry.category}</span>
         </div>
+        {entry.notes && entry.notes.trim() && (
+          <div className="entry-note">📝 {entry.notes}</div>
+        )}
       </div>
       <div className={`entry-amount ${isExp ? 'exp' : 'inc'}`}>
         {isExp ? '−' : '+'}{formatCurrency(entry.amount)}

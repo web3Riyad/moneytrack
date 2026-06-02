@@ -292,3 +292,14 @@ input[type='number'] { -moz-appearance: textfield; }
 @media (max-width: 360px) {
   .bal-value { font-size: 11px; }
 }
+
+/* Entry note */
+.entry-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

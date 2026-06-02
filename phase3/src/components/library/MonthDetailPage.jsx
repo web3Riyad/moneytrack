@@ -177,6 +177,9 @@ function EntriesTab({ entries, onDelete }) {
             <div className="entry-info">
               <div className="entry-name">{e.name}</div>
               <div className="entry-meta">{formatDateLabel(e.date)} · {e.source} <span className="entry-tag">{e.category}</span></div>
+              {e.notes && e.notes.trim() && (
+                <div className="entry-note">📝 {e.notes}</div>
+              )}
             </div>
             <div className={`entry-amount ${isExp ? 'exp' : 'inc'}`}>{isExp ? '−' : '+'}{formatCurrency(e.amount)}</div>
             <button className="delete-btn" onClick={() => onDelete(e.id)}>✕</button>
