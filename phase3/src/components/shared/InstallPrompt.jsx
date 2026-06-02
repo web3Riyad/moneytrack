@@ -78,7 +78,7 @@ export default function InstallPrompt() {
       <div className="install-prompt__text">
         <div className="install-prompt__title">Install MoneyTrack</div>
         {showAndroid && (
-          <div className="install-prompt__sub">Add to your home screen for the best experience</div>
+          <div className="install-prompt__sub">Add to home screen</div>
         )}
         {showIOS && (
           <div className="install-prompt__sub">

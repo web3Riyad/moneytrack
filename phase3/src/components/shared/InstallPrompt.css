@@ -1,45 +1,55 @@
 .install-prompt {
   position: fixed;
   bottom: calc(var(--nav-h) + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 28px);
+  left: 14px;
+  right: 14px;
+  width: auto;
   max-width: calc(var(--max-w) - 28px);
+  margin: 0 auto;
   background: var(--card);
   border: 1px solid var(--green);
   border-radius: var(--r-lg);
-  padding: 14px;
+  padding: 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   z-index: 90;
   box-shadow: 0 4px 24px rgba(74, 222, 128, 0.12);
   animation: fadeUp 0.3s ease both;
+  /* Prevent overflow */
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .install-prompt__icon img {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   flex-shrink: 0;
 }
 
 .install-prompt__text {
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* allows text to shrink */
 }
 
 .install-prompt__title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .install-prompt__sub {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
   line-height: 1.4;
+  /* Allow wrapping on small screens */
+  white-space: normal;
+  word-break: break-word;
 }
 
 .install-prompt__sub strong {
@@ -50,34 +60,59 @@
 .install-prompt__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .install-btn {
   background: var(--green);
   color: #0a1f10;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 7px 16px;
+  padding: 7px 14px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
   transition: opacity var(--t-fast);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .install-btn:hover { opacity: 0.9; }
 
 .dismiss-btn {
   color: var(--text-muted);
-  font-size: 14px;
-  padding: 6px;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
   border: none;
   background: none;
   cursor: pointer;
-  transition: color var(--t-fast);
+  flex-shrink: 0;
+  transition: color var(--t-fast), background var(--t-fast);
 }
 
-.dismiss-btn:hover { color: var(--text-primary); }
+.dismiss-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface);
+}
+
+/* Compact layout for very small screens */
+@media (max-width: 360px) {
+  .install-prompt {
+    padding: 10px;
+    gap: 8px;
+  }
+  .install-prompt__icon img {
+    width: 34px;
+    height: 34px;
+  }
+  .install-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
