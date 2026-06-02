@@ -1,0 +1,55 @@
+.topbar {
+  height: var(--topbar-h);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-base   { font-size: 17px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+.logo-accent { font-size: 17px; font-weight: 700; color: var(--green); }
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--green-dim);
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--t-fast);
+}
+.topbar-avatar:hover { opacity: 0.85; }
+
+.back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.back-btn svg { width: 16px; height: 16px; stroke: var(--text-primary); }
+.page-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }

@@ -1,0 +1,66 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-w);
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: 4px;
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  transition: background var(--t-fast);
+  flex: 1;
+}
+.nav-item svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text-muted);
+  transition: stroke var(--t-fast);
+}
+.nav-item.active {
+  background: var(--green-dim);
+}
+.nav-item.active svg { stroke: var(--green); }
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color var(--t-fast);
+}
+.nav-item.active .nav-label { color: var(--green); }
+
+/* Centre + button */
+.nav-add {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 6px;
+  transition: opacity var(--t-fast), transform var(--t-fast);
+}
+.nav-add:hover   { opacity: 0.9; }
+.nav-add:active  { transform: scale(0.95); }
+.nav-add svg {
+  width: 22px;
+  height: 22px;
+  stroke: #0a1f10;
+}

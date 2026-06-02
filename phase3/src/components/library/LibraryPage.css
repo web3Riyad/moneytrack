@@ -1,0 +1,84 @@
+.lib-page, .detail-page { display: flex; flex-direction: column; min-height: 100vh; }
+.lib-scroll, .detail-scroll { padding: 8px 14px; }
+
+/* Month card */
+.month-card {
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color var(--t-fast);
+}
+.month-card:hover { border-color: var(--border-hover); }
+.month-card:active { border-color: var(--green); }
+
+.mc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.mc-name  { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.mc-right { display: flex; align-items: center; gap: 6px; }
+.mc-badge {
+  font-size: 10px;
+  background: var(--green-bg);
+  color: var(--green);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.mc-arrow { font-size: 16px; color: var(--text-muted); }
+
+.mc-stats { display: flex; gap: 5px; }
+.mc-stat  { flex: 1; background: var(--bg); border-radius: 8px; padding: 8px; }
+.mc-stat-label { font-size: 9px; color: var(--text-muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+.mc-stat-val   { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+
+.mc-prog-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+.mc-prog-label { font-size: 10px; color: var(--text-muted); }
+.mc-prog-pct   { font-size: 10px; font-weight: 600; }
+
+/* Detail header */
+.detail-header {
+  height: var(--topbar-h);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.detail-title { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+
+.detail-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 14px 10px;
+  flex-shrink: 0;
+}
+.detail-tab {
+  flex: 1;
+  padding: 9px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  transition: all var(--t-fast);
+}
+.detail-tab.on {
+  background: var(--card);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.day-row-simple {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+}
