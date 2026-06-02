@@ -54,7 +54,7 @@ export default function InstallPrompt() {
       </div>
       <div className="ip-text">
         <div className="ip-title">Install MoneyTrack</div>
-        {showAndroid && <div className="ip-sub">Add to home screen</div>}
+        {showAndroid && <div className="ip-sub">Install app</div>}
         {showIOS     && <div className="ip-sub">Tap <b>Share</b> → <b>Add to Home Screen</b></div>}
       </div>
       <div className="ip-actions">
