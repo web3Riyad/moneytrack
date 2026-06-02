@@ -180,6 +180,22 @@ export default function ProfilePage() {
           onClick={() => setDeleteModal(true)}
         />
 
+        
+        {/* Install App */}
+        <div className="sec-title" style={{ marginTop: 16 }}>App</div>
+        <SettingRow
+          icon="📲" iconClass="g"
+          label="Install MoneyTrack"
+          right={<span className="install-tag">PWA</span>}
+          onClick={() => {
+            if (window.__installPrompt) {
+              window.__installPrompt.prompt()
+            } else {
+              alert('To install on iOS: tap Share then Add to Home Screen')
+            }
+          }}
+        />
+
         <button className="signout-btn" onClick={handleSignOut}>Sign out</button>
 
       </div>

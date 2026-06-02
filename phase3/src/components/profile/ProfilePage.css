@@ -98,3 +98,45 @@
 .modal-close { color: var(--text-muted); font-size: 16px; padding: 4px 8px; border-radius: 6px; }
 .modal-close:hover { color: var(--text-primary); background: var(--surface); }
 .modal-save { margin-top: 12px; }
+
+/* Toggle switch */
+.toggle {
+  width: 36px; height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--t-base);
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--green); }
+.toggle-dot {
+  width: 16px; height: 16px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: transform var(--t-base);
+}
+.toggle.on .toggle-dot { transform: translateX(16px); }
+
+/* Modal extras */
+.modal-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.modal-danger { color: var(--red) !important; }
+
+/* Install tag badge */
+.install-tag {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid var(--green);
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}

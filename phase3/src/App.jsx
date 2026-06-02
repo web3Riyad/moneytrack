@@ -6,11 +6,11 @@ import AddEntryPage    from './components/add/AddEntryPage'
 import LibraryPage     from './components/library/LibraryPage'
 import MonthDetailPage from './components/library/MonthDetailPage'
 import ProfilePage     from './components/profile/ProfilePage'
+import InstallPrompt   from './components/shared/InstallPrompt'
 
 export default function App() {
   const { user, loading } = useAuth()
 
-  // Show spinner while Firebase checks session
   if (loading) {
     return (
       <div className="loading-screen">
@@ -20,19 +20,22 @@ export default function App() {
     )
   }
 
-  // Not logged in — show auth screen
   if (!user) return <AuthScreen />
 
-  // Logged in — show app with routes
   return (
-    <Routes>
-      <Route path="/"                    element={<HomePage />} />
-      <Route path="/home"                element={<Navigate to="/" replace />} />
-      <Route path="/add"                 element={<AddEntryPage />} />
-      <Route path="/library"             element={<LibraryPage />} />
-      <Route path="/library/:yearMonth"  element={<MonthDetailPage />} />
-      <Route path="/profile"             element={<ProfilePage />} />
-      <Route path="*"                    element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/"                    element={<HomePage />} />
+        <Route path="/home"                element={<Navigate to="/" replace />} />
+        <Route path="/add"                 element={<AddEntryPage />} />
+        <Route path="/library"             element={<LibraryPage />} />
+        <Route path="/library/:yearMonth"  element={<MonthDetailPage />} />
+        <Route path="/profile"             element={<ProfilePage />} />
+        <Route path="*"                    element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* Install prompt — shows on Android/iOS when app is not installed */}
+      <InstallPrompt />
+    </>
   )
 }

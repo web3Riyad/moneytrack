@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.4",
+    "date-fns": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
-    "recharts": "^2.12.7",
-    "date-fns": "^3.6.0"
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -25,6 +25,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.2",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "sharp": "^0.34.5",
     "vite": "^5.2.12"
   }
 }
