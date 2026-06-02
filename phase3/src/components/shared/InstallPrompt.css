@@ -1,88 +1,96 @@
-.install-prompt {
+/* Install prompt — fixed to bottom, always fits screen width */
+.ip-wrap {
   position: fixed;
+  /* Use left/right instead of transform — guaranteed to fit screen */
+  left: 12px;
+  right: 12px;
   bottom: calc(var(--nav-h) + 12px);
-  left: 14px;
-  right: 14px;
-  width: auto;
-  max-width: calc(var(--max-w) - 28px);
-  margin: 0 auto;
+  /* No width, no max-width here — left+right handles it */
+
   background: var(--card);
-  border: 1px solid var(--green);
-  border-radius: var(--r-lg);
+  border: 1.5px solid var(--green);
+  border-radius: 14px;
   padding: 12px;
+  z-index: 200;
+
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
-  z-index: 90;
-  box-shadow: 0 4px 24px rgba(74, 222, 128, 0.12);
-  animation: fadeUp 0.3s ease both;
-  /* Prevent overflow */
+
+  box-shadow: 0 4px 20px rgba(74, 222, 128, 0.15);
+  animation: fadeUp 0.25s ease both;
+
+  /* Critical: prevent any child from causing overflow */
   overflow: hidden;
-  box-sizing: border-box;
+  min-width: 0;
 }
 
-.install-prompt__icon img {
+/* Icon — fixed size, never shrinks */
+.ip-icon {
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  flex-shrink: 0;
+}
+.ip-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: block;
 }
 
-.install-prompt__text {
-  flex: 1;
-  min-width: 0; /* allows text to shrink */
+/* Text block — takes remaining space, clips if too long */
+.ip-text {
+  flex: 1 1 0;   /* grow + shrink, base 0 so it doesn't push others out */
+  min-width: 0;  /* allows flex child to shrink below content size */
+  overflow: hidden;
 }
-
-.install-prompt__title {
+.ip-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.install-prompt__sub {
+.ip-sub {
   font-size: 11px;
   color: var(--text-muted);
+  margin-top: 2px;
   line-height: 1.4;
-  /* Allow wrapping on small screens */
-  white-space: normal;
+  /* Allow wrapping — better UX than ellipsis for instructions */
   word-break: break-word;
 }
-
-.install-prompt__sub strong {
+.ip-sub b {
   color: var(--green);
   font-weight: 600;
 }
 
-.install-prompt__actions {
+/* Actions — fixed size, never shrinks */
+.ip-actions {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
 }
 
-.install-btn {
+.ip-btn {
   background: var(--green);
   color: #0a1f10;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 700;
   padding: 7px 14px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: opacity var(--t-fast);
   white-space: nowrap;
-  flex-shrink: 0;
+  transition: opacity 0.12s ease;
 }
+.ip-btn:hover   { opacity: 0.9; }
+.ip-btn:active  { opacity: 0.8; transform: scale(0.97); }
 
-.install-btn:hover { opacity: 0.9; }
-
-.dismiss-btn {
-  color: var(--text-muted);
-  font-size: 16px;
+.ip-close {
   width: 28px;
   height: 28px;
   display: flex;
@@ -91,28 +99,12 @@
   border-radius: 6px;
   border: none;
   background: none;
+  color: var(--text-muted);
+  font-size: 14px;
   cursor: pointer;
-  flex-shrink: 0;
-  transition: color var(--t-fast), background var(--t-fast);
+  transition: color 0.12s ease, background 0.12s ease;
 }
-
-.dismiss-btn:hover {
+.ip-close:hover {
   color: var(--text-primary);
   background: var(--surface);
-}
-
-/* Compact layout for very small screens */
-@media (max-width: 360px) {
-  .install-prompt {
-    padding: 10px;
-    gap: 8px;
-  }
-  .install-prompt__icon img {
-    width: 34px;
-    height: 34px;
-  }
-  .install-btn {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
 }
